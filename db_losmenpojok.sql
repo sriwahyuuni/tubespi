@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 07, 2022 at 11:00 AM
+-- Generation Time: Jun 07, 2022 at 08:14 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.1.1
 
@@ -57,12 +57,29 @@ INSERT INTO `tbl_barang` (`id_barang`, `nama_barang`, `harga_barang`, `jenis_bar
 CREATE TABLE `tbl_kamar` (
   `id_kamar` int(11) NOT NULL,
   `id_tipe` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
+  `status` varchar(20) NOT NULL,
   `tingkat` int(5) NOT NULL,
   `nomor_kamar` int(10) NOT NULL,
   `kapasitas_maks` int(5) NOT NULL,
   `harga_kamar` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tbl_kamar`
+--
+
+INSERT INTO `tbl_kamar` (`id_kamar`, `id_tipe`, `status`, `tingkat`, `nomor_kamar`, `kapasitas_maks`, `harga_kamar`) VALUES
+(1, 1, 'Kosong', 1, 101, 2, '200000'),
+(2, 1, 'Kosong', 1, 102, 2, '200000'),
+(3, 2, 'Kosong', 3, 301, 2, '125000'),
+(4, 2, 'Kosong', 3, 302, 2, '125000'),
+(5, 2, 'Kosong', 3, 303, 2, '125000'),
+(6, 1, 'Kosong', 2, 202, 2, '200000'),
+(7, 1, 'Kosong', 2, 201, 2, '200000'),
+(8, 1, 'Kosong', 1, 104, 2, '200000'),
+(9, 1, 'Kosong', 1, 105, 2, '200000'),
+(10, 2, 'Kosong', 3, 305, 2, '125000'),
+(11, 2, 'Kosong', 3, 306, 2, '125000');
 
 -- --------------------------------------------------------
 
@@ -153,7 +170,9 @@ INSERT INTO `tbl_pengunjung` (`id_pengunjung`, `nama_pengunjung`, `no_pengenal`,
 (2, 'Lydia Sarah', '1923691283', '0875345332', 'Malaysia', 'Perumahan Citra', 'lydias.jpg'),
 (3, 'Louwis ', '2017988329', '061983932', 'Singapore', '', 'louwis.jpg'),
 (4, 'Felly Felcia', '927987912312', '08187398', 'Indonesia', 'Jalan Merdeka no 13', 'felly.jpg'),
-(5, 'Riandi Burhan', '2379345628', '08656656', 'Indonesia', 'Jalan Selebes', 'Riandi.jpg');
+(5, 'Riandi Burhan', '2379345628', '08656656', 'Indonesia', 'Jalan Selebes', 'Riandi.jpg'),
+(6, 'Elsa Jamine', '122821439388', '081234251627', 'Indonesia', 'Jalan Pulau Indah', 'elsa.jpg'),
+(7, 'Laura Hidayah', '1243654383465', '0828274504', 'Indonesia', 'Jalan Keselamatan', 'laura.jpg');
 
 -- --------------------------------------------------------
 
@@ -205,7 +224,8 @@ ALTER TABLE `tbl_barang`
 -- Indexes for table `tbl_kamar`
 --
 ALTER TABLE `tbl_kamar`
-  ADD PRIMARY KEY (`id_kamar`);
+  ADD PRIMARY KEY (`id_kamar`),
+  ADD KEY `id_tipe` (`id_tipe`);
 
 --
 -- Indexes for table `tbl_pegawai`
@@ -217,13 +237,19 @@ ALTER TABLE `tbl_pegawai`
 -- Indexes for table `tbl_pembayaran`
 --
 ALTER TABLE `tbl_pembayaran`
-  ADD PRIMARY KEY (`id_pembayaran`);
+  ADD PRIMARY KEY (`id_pembayaran`),
+  ADD KEY `id_kasir` (`id_kasir`),
+  ADD KEY `id_pemesanan` (`id_pemesanan`),
+  ADD KEY `id_pengunjung` (`id_pengunjung`);
 
 --
 -- Indexes for table `tbl_pemesanan`
 --
 ALTER TABLE `tbl_pemesanan`
-  ADD PRIMARY KEY (`id_pemesanan`);
+  ADD PRIMARY KEY (`id_pemesanan`),
+  ADD KEY `id_kamar` (`id_kamar`),
+  ADD KEY `id_kasir` (`id_kasir`),
+  ADD KEY `id_pengunjung` (`id_pengunjung`);
 
 --
 -- Indexes for table `tbl_pengunjung`
@@ -235,7 +261,9 @@ ALTER TABLE `tbl_pengunjung`
 -- Indexes for table `tbl_tambahan`
 --
 ALTER TABLE `tbl_tambahan`
-  ADD PRIMARY KEY (`id_tambahan`);
+  ADD PRIMARY KEY (`id_tambahan`),
+  ADD KEY `id_pemesanan` (`id_pemesanan`),
+  ADD KEY `id_barang` (`id_barang`);
 
 --
 -- Indexes for table `tbl_tipe`
@@ -257,7 +285,7 @@ ALTER TABLE `tbl_barang`
 -- AUTO_INCREMENT for table `tbl_kamar`
 --
 ALTER TABLE `tbl_kamar`
-  MODIFY `id_kamar` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_kamar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbl_pegawai`
@@ -281,7 +309,7 @@ ALTER TABLE `tbl_pemesanan`
 -- AUTO_INCREMENT for table `tbl_pengunjung`
 --
 ALTER TABLE `tbl_pengunjung`
-  MODIFY `id_pengunjung` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pengunjung` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tbl_tambahan`
@@ -294,6 +322,39 @@ ALTER TABLE `tbl_tambahan`
 --
 ALTER TABLE `tbl_tipe`
   MODIFY `id_tipe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `tbl_kamar`
+--
+ALTER TABLE `tbl_kamar`
+  ADD CONSTRAINT `tbl_kamar_ibfk_1` FOREIGN KEY (`id_tipe`) REFERENCES `tbl_tipe` (`id_tipe`);
+
+--
+-- Constraints for table `tbl_pembayaran`
+--
+ALTER TABLE `tbl_pembayaran`
+  ADD CONSTRAINT `tbl_pembayaran_ibfk_1` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_user`),
+  ADD CONSTRAINT `tbl_pembayaran_ibfk_2` FOREIGN KEY (`id_pemesanan`) REFERENCES `tbl_pemesanan` (`id_pemesanan`),
+  ADD CONSTRAINT `tbl_pembayaran_ibfk_3` FOREIGN KEY (`id_pengunjung`) REFERENCES `tbl_pengunjung` (`id_pengunjung`);
+
+--
+-- Constraints for table `tbl_pemesanan`
+--
+ALTER TABLE `tbl_pemesanan`
+  ADD CONSTRAINT `tbl_pemesanan_ibfk_1` FOREIGN KEY (`id_kamar`) REFERENCES `tbl_kamar` (`id_kamar`),
+  ADD CONSTRAINT `tbl_pemesanan_ibfk_2` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_user`),
+  ADD CONSTRAINT `tbl_pemesanan_ibfk_3` FOREIGN KEY (`id_pengunjung`) REFERENCES `tbl_pengunjung` (`id_pengunjung`);
+
+--
+-- Constraints for table `tbl_tambahan`
+--
+ALTER TABLE `tbl_tambahan`
+  ADD CONSTRAINT `tbl_tambahan_ibfk_1` FOREIGN KEY (`id_pemesanan`) REFERENCES `tbl_pemesanan` (`id_pemesanan`),
+  ADD CONSTRAINT `tbl_tambahan_ibfk_2` FOREIGN KEY (`id_barang`) REFERENCES `tbl_barang` (`id_barang`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
