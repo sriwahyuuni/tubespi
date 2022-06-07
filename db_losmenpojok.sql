@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 12, 2022 at 04:20 PM
+-- Generation Time: Jun 07, 2022 at 11:00 AM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.1.1
 
@@ -144,6 +144,17 @@ CREATE TABLE `tbl_pengunjung` (
   `foto_identitas` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `tbl_pengunjung`
+--
+
+INSERT INTO `tbl_pengunjung` (`id_pengunjung`, `nama_pengunjung`, `no_pengenal`, `no_hp_pengunjung`, `negara_pengunjung`, `alamat_pengunjung`, `foto_identitas`) VALUES
+(1, 'Elmina', '172388238303', '08273647', 'Indonesia', 'Jalan Bunga', 'elmina.jpg'),
+(2, 'Lydia Sarah', '1923691283', '0875345332', 'Malaysia', 'Perumahan Citra', 'lydias.jpg'),
+(3, 'Louwis ', '2017988329', '061983932', 'Singapore', '', 'louwis.jpg'),
+(4, 'Felly Felcia', '927987912312', '08187398', 'Indonesia', 'Jalan Merdeka no 13', 'felly.jpg'),
+(5, 'Riandi Burhan', '2379345628', '08656656', 'Indonesia', 'Jalan Selebes', 'Riandi.jpg');
+
 -- --------------------------------------------------------
 
 --
@@ -270,7 +281,7 @@ ALTER TABLE `tbl_pemesanan`
 -- AUTO_INCREMENT for table `tbl_pengunjung`
 --
 ALTER TABLE `tbl_pengunjung`
-  MODIFY `id_pengunjung` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_pengunjung` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_tambahan`
