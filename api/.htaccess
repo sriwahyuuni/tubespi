@@ -1,3 +1,7 @@
 RewriteEngine On # Turn on the rewriting engine
 RewriteRule ^pengunjung/?$ pengunjung.php [NC,L]
 RewriteRule ^pengunjung/([0-9]+)/?$ pengunjung.php?id=$1 [NC,L]
+
+RewriteEngine On # Turn on the rewriting engine
+RewriteRule ^kamar/?$ kamar.php [NC,L]
+RewriteRule ^kamar/([0-9]+)/?$ kamar.php?id=$1 [NC,L]
