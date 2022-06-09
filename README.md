@@ -14,3 +14,4 @@ Aplikasi pengolahan Database : XAMPP
 Database Serdehana : db_losmenpojok.sql
 
 API penginapan serdehana.
+
