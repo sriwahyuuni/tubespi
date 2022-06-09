@@ -5,3 +5,15 @@ RewriteRule ^pengunjung/([0-9]+)/?$ pengunjung.php?id=$1 [NC,L]
 RewriteEngine On # Turn on the rewriting engine
 RewriteRule ^kamar/?$ kamar.php [NC,L]
 RewriteRule ^kamar/([0-9]+)/?$ kamar.php?id=$1 [NC,L]
+
+RewriteEngine On # Turn on the rewriting engine
+RewriteRule ^barang/?$ barang.php [NC,L]
+RewriteRule ^barang/([0-9]+)/?$ barang.php?id=$1 [NC,L]
+
+RewriteEngine On # Turn on the rewriting engine
+RewriteRule ^tipe/?$ tipe.php [NC,L]
+RewriteRule ^tipe/([0-9]+)/?$ tipe.php?id=$1 [NC,L]
+
+RewriteEngine On # Turn on the rewriting engine
+RewriteRule ^pegawai/?$ pegawai.php [NC,L]
+RewriteRule ^pegawai/([0-9]+)/?$ pegawai.php?id=$1 [NC,L]
