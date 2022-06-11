@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 07, 2022 at 08:14 PM
+-- Generation Time: Jun 11, 2022 at 10:10 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.1.1
 
@@ -46,7 +46,8 @@ INSERT INTO `tbl_barang` (`id_barang`, `nama_barang`, `harga_barang`, `jenis_bar
 (5, 'Shampoo Sachet', '2000', 'Sekali Pakai'),
 (6, 'Pop Mie', '7000', 'Sekali Pakai'),
 (7, 'Sikat Gigi', '5000', 'Sekali Pakai'),
-(8, 'Aqua', '4000', 'Sekali Pakai');
+(8, 'Aqua', '4000', 'Sekali Pakai'),
+(10, 'Chitato 75 gram', '13000', 'Sekali Pakai');
 
 -- --------------------------------------------------------
 
@@ -69,17 +70,16 @@ CREATE TABLE `tbl_kamar` (
 --
 
 INSERT INTO `tbl_kamar` (`id_kamar`, `id_tipe`, `status`, `tingkat`, `nomor_kamar`, `kapasitas_maks`, `harga_kamar`) VALUES
-(1, 1, 'Kosong', 1, 101, 2, '200000'),
-(2, 1, 'Kosong', 1, 102, 2, '200000'),
-(3, 2, 'Kosong', 3, 301, 2, '125000'),
+(1, 1, 'Ditempati', 1, 101, 2, '200000'),
+(2, 1, 'Ditempati', 1, 102, 2, '200000'),
+(3, 2, 'Ditempati', 3, 301, 2, '125000'),
 (4, 2, 'Kosong', 3, 302, 2, '125000'),
 (5, 2, 'Kosong', 3, 303, 2, '125000'),
 (6, 1, 'Kosong', 2, 202, 2, '200000'),
-(7, 1, 'Kosong', 2, 201, 2, '200000'),
+(7, 1, 'Ditempati', 2, 201, 2, '200000'),
 (8, 1, 'Kosong', 1, 104, 2, '200000'),
 (9, 1, 'Kosong', 1, 105, 2, '200000'),
-(10, 2, 'Kosong', 3, 305, 2, '125000'),
-(11, 2, 'Kosong', 3, 306, 2, '125000');
+(10, 2, 'Kosong', 3, 305, 2, '125000');
 
 -- --------------------------------------------------------
 
@@ -88,8 +88,8 @@ INSERT INTO `tbl_kamar` (`id_kamar`, `id_tipe`, `status`, `tingkat`, `nomor_kama
 --
 
 CREATE TABLE `tbl_pegawai` (
-  `id_user` int(11) NOT NULL,
-  `nama_user` varchar(200) NOT NULL,
+  `id_pegawai` int(11) NOT NULL,
+  `nama_pegawai` varchar(200) NOT NULL,
   `nik_pegawai` varchar(20) NOT NULL,
   `alamat_pegawai` varchar(250) NOT NULL,
   `no_hp_pegawai` varchar(20) NOT NULL,
@@ -103,11 +103,12 @@ CREATE TABLE `tbl_pegawai` (
 -- Dumping data for table `tbl_pegawai`
 --
 
-INSERT INTO `tbl_pegawai` (`id_user`, `nama_user`, `nik_pegawai`, `alamat_pegawai`, `no_hp_pegawai`, `foto_pegawai`, `tgl_kerja`, `status`, `pekerjaan`) VALUES
+INSERT INTO `tbl_pegawai` (`id_pegawai`, `nama_pegawai`, `nik_pegawai`, `alamat_pegawai`, `no_hp_pegawai`, `foto_pegawai`, `tgl_kerja`, `status`, `pekerjaan`) VALUES
 (1, 'Katherin Anna Patherisia Lesnussa', '191401078', 'Jalan Bunga no 12', '087766554433', 'foto.jpg', '2019-05-01', 'Aktif', 'Kasir'),
 (2, 'Sri Wahyuni', '191402045', 'Jalan Melati no 10', '089911223344', 'foto(1).jpg', '2019-03-13', 'Aktif', 'Admin'),
 (3, 'Afgan', '130239372', 'Jalan Kemerdekaan no 13', '08775365922', 'kamera123.jpg', '2020-05-13', 'Aktif', 'Keamanan'),
-(4, 'Siti Mirani', '1287835697', 'Jalan Kuburan 12 gang 4', '08556325732', 'camera_0022.jpg', '2020-04-14', 'Aktif', 'Cleaning Service');
+(4, 'Siti Mirani', '1287835697', 'Jalan Kuburan 12 gang 4', '08556325732', 'camera_0022.jpg', '2020-04-14', 'Aktif', 'Cleaning Service'),
+(6, 'Elmina Tiodora', '121212121212', 'Jalan Bengkalis', '08475637468', 'foto56.jpg', '2020-09-13', 'Aktif', 'Kasir');
 
 -- --------------------------------------------------------
 
@@ -120,7 +121,7 @@ CREATE TABLE `tbl_pembayaran` (
   `id_pemesanan` int(11) NOT NULL,
   `id_pengunjung` int(11) NOT NULL,
   `id_kasir` int(11) NOT NULL,
-  `check_out` datetime NOT NULL,
+  `check_out` date NOT NULL DEFAULT current_timestamp(),
   `tagihan_kamar` varchar(100) NOT NULL,
   `tagihan_tambahan` varchar(100) NOT NULL,
   `pekerja_1` varchar(200) NOT NULL,
@@ -138,12 +139,22 @@ CREATE TABLE `tbl_pemesanan` (
   `id_pengunjung` int(11) NOT NULL,
   `id_kamar` int(11) NOT NULL,
   `id_kasir` int(11) NOT NULL,
-  `check_in` datetime NOT NULL,
+  `check_in` date NOT NULL DEFAULT current_timestamp(),
   `jumlah_pengunjung` int(10) NOT NULL,
   `deposit` varchar(100) NOT NULL,
   `pekerja_1` varchar(200) DEFAULT NULL,
   `pekerja_2` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tbl_pemesanan`
+--
+
+INSERT INTO `tbl_pemesanan` (`id_pemesanan`, `id_pengunjung`, `id_kamar`, `id_kasir`, `check_in`, `jumlah_pengunjung`, `deposit`, `pekerja_1`, `pekerja_2`) VALUES
+(1, 1, 1, 1, '2022-06-09', 1, '50000', 'Sri Wahyuni', 'Afgan'),
+(2, 4, 2, 1, '2022-06-09', 2, '50000', 'Sri Wahyuni', 'Afgan'),
+(3, 4, 2, 6, '2022-06-09', 3, '50000', 'Sri Wahyuni', 'Afgan'),
+(4, 7, 7, 6, '2022-06-09', 1, '50000', 'Sri Wahyuni', 'Afgan');
 
 -- --------------------------------------------------------
 
@@ -190,6 +201,15 @@ CREATE TABLE `tbl_tambahan` (
   `total_harga` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `tbl_tambahan`
+--
+
+INSERT INTO `tbl_tambahan` (`id_tambahan`, `id_pemesanan`, `id_barang`, `nama_barang`, `harga_barang`, `jumlah_barang`, `total_harga`) VALUES
+(1, 4, 1, 'Bantal', '10000', 1, '10000'),
+(2, 4, 3, 'Selimut', '10000', 1, '10000'),
+(4, 4, 6, 'Pop Mie', '7000', 2, '14000');
+
 -- --------------------------------------------------------
 
 --
@@ -208,7 +228,7 @@ CREATE TABLE `tbl_tipe` (
 
 INSERT INTO `tbl_tipe` (`id_tipe`, `tipe_kamar`, `detail`) VALUES
 (1, 'Khusus', 'Perlengkapan :\r\n1 AC\r\n1 Lemari\r\n1 Televisi\r\n1 Bedcover\r\n1 Selimut\r\n2 Bantal\r\n2 Guling\r\nKamar Mandi dalam Ruangan'),
-(2, 'Umum', 'Perlengkapan :\r\n1 Kipas Angin\r\n1 Lemari\r\n1 Televisi\r\n1 Bedcover\r\n1 Selimut\r\n2 Bantal\r\n2 Guling\r\nKamar Mandi diluar Ruangan');
+(2, 'Umum', '1 Kipas Angin\n1 Lemari\n1 Televisi\n1 Bedcover\n1 Selimut\n2 Bantal\n2 Guling\nKamar Mandi diluar Ruangan');
 
 --
 -- Indexes for dumped tables
@@ -231,7 +251,7 @@ ALTER TABLE `tbl_kamar`
 -- Indexes for table `tbl_pegawai`
 --
 ALTER TABLE `tbl_pegawai`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_pegawai`);
 
 --
 -- Indexes for table `tbl_pembayaran`
@@ -279,7 +299,7 @@ ALTER TABLE `tbl_tipe`
 -- AUTO_INCREMENT for table `tbl_barang`
 --
 ALTER TABLE `tbl_barang`
-  MODIFY `id_barang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_barang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tbl_kamar`
@@ -291,7 +311,7 @@ ALTER TABLE `tbl_kamar`
 -- AUTO_INCREMENT for table `tbl_pegawai`
 --
 ALTER TABLE `tbl_pegawai`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_pegawai` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbl_pembayaran`
@@ -303,7 +323,7 @@ ALTER TABLE `tbl_pembayaran`
 -- AUTO_INCREMENT for table `tbl_pemesanan`
 --
 ALTER TABLE `tbl_pemesanan`
-  MODIFY `id_pemesanan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_pemesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tbl_pengunjung`
@@ -315,7 +335,7 @@ ALTER TABLE `tbl_pengunjung`
 -- AUTO_INCREMENT for table `tbl_tambahan`
 --
 ALTER TABLE `tbl_tambahan`
-  MODIFY `id_tambahan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_tambahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbl_tipe`
@@ -337,7 +357,7 @@ ALTER TABLE `tbl_kamar`
 -- Constraints for table `tbl_pembayaran`
 --
 ALTER TABLE `tbl_pembayaran`
-  ADD CONSTRAINT `tbl_pembayaran_ibfk_1` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_user`),
+  ADD CONSTRAINT `tbl_pembayaran_ibfk_1` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_pegawai`),
   ADD CONSTRAINT `tbl_pembayaran_ibfk_2` FOREIGN KEY (`id_pemesanan`) REFERENCES `tbl_pemesanan` (`id_pemesanan`),
   ADD CONSTRAINT `tbl_pembayaran_ibfk_3` FOREIGN KEY (`id_pengunjung`) REFERENCES `tbl_pengunjung` (`id_pengunjung`);
 
@@ -346,7 +366,7 @@ ALTER TABLE `tbl_pembayaran`
 --
 ALTER TABLE `tbl_pemesanan`
   ADD CONSTRAINT `tbl_pemesanan_ibfk_1` FOREIGN KEY (`id_kamar`) REFERENCES `tbl_kamar` (`id_kamar`),
-  ADD CONSTRAINT `tbl_pemesanan_ibfk_2` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_user`),
+  ADD CONSTRAINT `tbl_pemesanan_ibfk_2` FOREIGN KEY (`id_kasir`) REFERENCES `tbl_pegawai` (`id_pegawai`),
   ADD CONSTRAINT `tbl_pemesanan_ibfk_3` FOREIGN KEY (`id_pengunjung`) REFERENCES `tbl_pengunjung` (`id_pengunjung`);
 
 --
