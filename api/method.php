@@ -28,7 +28,7 @@ class Pengunjung{
         $query="SELECT * FROM tbl_pengunjung";
         if($id !=0)
         {
-            $query.=" WHERE id_pengunjung=".$id." LIMIT 1";
+            $query.=" WHERE no_pengenal=".$id." OR no_hp_pengunjung=".$id." LIMIT 1";
         }
         $data=array();
         $result=$koneksi->query($query);
@@ -199,10 +199,10 @@ class Kamar{
     public function get_kamar($id=0)
     {
         global $koneksi;
-        $query="SELECT * FROM tbl_kamar";
+        $query="SELECT * FROM tbl_kamar JOIN tbl_tipe ON tbl_kamar.id_tipe = tbl_tipe.id_tipe";
         if($id !=0)
         {
-            $query.=" WHERE id_kamar=".$id." LIMIT 1";
+            $query.=" WHERE id_kamar=".$id." OR nomor_kamar=".$id." LIMIT 1";
         }
         $data=array();
         $result=$koneksi->query($query);
@@ -320,7 +320,7 @@ class Kamar{
         $arrcheckpost = array('harga_kamar'=>'');
         parse_str(file_get_contents("php://input"),$input);
         if(isset($input['harga_kamar'])){
-            $result = mysqli_query($koneksi,"UPDATE tbl_kamar SET harga_kamar= '{$input['harga_kamar']}' WHERE id_kamar='$id'
+            $result = mysqli_query($koneksi,"UPDATE tbl_kamar SET harga_kamar= '{$input['harga_kamar']}' WHERE nomor_kamar='$id'
             ");
 
             if($result)
@@ -588,7 +588,7 @@ class Pegawai{
         $query="SELECT * FROM tbl_pegawai";
         if($id !=0)
         {
-            $query.=" WHERE id_pegawai=".$id." LIMIT 1";
+            $query.=" WHERE id_pegawai=".$id." OR nik_pegawai=".$id." LIMIT 1";
         }
         $data=array();
         $result=$koneksi->query($query);
@@ -646,7 +646,7 @@ class Pegawai{
     public function update_pengunjung($id)
     {
         global $koneksi;
-        $arrcheckpost = array('nama_pegawai'=>'','nik_pegawai'=>'','alamat_pegawai'=>'','no_hp_pegawai'=>'','foto_pegawi'=>'','tgl_kerja'=>'','status'=>'','pekerjaan'=>'');
+        $arrcheckpost = array('nama_pegawai'=>'','nik_pegawai'=>'','alamat_pegawai'=>'','no_hp_pegawai'=>'','foto_pegawai'=>'','tgl_kerja'=>'','status'=>'','pekerjaan'=>'');
         $hitung = count(array_intersect_key($_POST,$arrcheckpost));
         if($hitung == count($arrcheckpost)){
             $result = mysqli_query($koneksi,"UPDATE tbl_pegawai SET
@@ -730,6 +730,291 @@ class Pegawai{
             $response=array(
                 'status'=> 0,
                 'message'=>'Paramater tidak sesuai.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+}
+
+
+// Class untuk mengolah tabel tbl_pemesanan
+class Pemesanan{
+    public function get_all_pemesanan()
+    {
+        global $koneksi;
+        $query= "SELECT * FROM tbl_pemesanan";
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Pemesanan Kamar Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        
+    }
+    public function get_pemesanan($id=0)
+    {
+        global $koneksi;
+        $query="SELECT * FROM tbl_pemesanan JOIN tbl_pengunjung ON tbl_pemesanan.id_pengunjung = tbl_pengunjung.id_pengunjung";
+        if($id !=0)
+        {
+            $query.=" WHERE no_pengenal=".$id." OR id_pemesanan=".$id." LIMIT 1";
+        }
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Pemesanan Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    public function insert_pemesanan()
+    {
+        global $koneksi;
+        $arrcheckpost = array('nik_pengunjung'=>'','no_kamar'=>'','id_kasir'=>'','tanggal_chekin'=>'','jumlah_pengunjung'=>'','deposit'=>'','pekerja_1'=>'','pekerja_2'=>'');
+        $hitung = count(array_intersect_key($_POST,$arrcheckpost));
+        if($hitung == count($arrcheckpost)){
+            $no_kamar = $_POST['no_kamar'];
+            $querykamar =$koneksi->query("SELECT * FROM tbl_kamar WHERE nomor_kamar = '$no_kamar' LIMIT 1");
+            $detailkamar = $querykamar->fetch_assoc();
+            $id_kamar = $detailkamar['id_kamar'];
+            $status_kamar = $detailkamar['status'];
+            if($status_kamar=="Ditempati"){
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Pemesanan Gagal Kamar sudah ditempati.'
+                );
+            }
+            else{
+            $no_pengenal = $_POST['nik_pengunjung'];
+            $querypengunjung =$koneksi->query("SELECT * FROM tbl_pengunjung WHERE no_pengenal = '$no_pengenal' LIMIT 1");
+            $detailpengunjung = $querypengunjung->fetch_assoc();
+            $id_pengunjung = $detailpengunjung['id_pengunjung'];
+            
+            $result = mysqli_query($koneksi,"INSERT INTO tbl_pemesanan SET
+            id_pengunjung='$id_pengunjung',
+            id_kamar='$id_kamar',
+            id_kasir='$_POST[id_kasir]',
+            check_in='$_POST[tanggal_chekin]',
+            jumlah_pengunjung='$_POST[jumlah_pengunjung]',
+            deposit='$_POST[deposit]',
+            pekerja_1='$_POST[pekerja_1]',
+            pekerja_2='$_POST[pekerja_2]'
+            ");
+
+            if($result)
+            {
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Pemesanan berhasil.'
+                );
+                $koneksi->query("UPDATE tbl_kamar SET status = 'Ditempati' WHERE id_kamar = '$id_kamar'");
+            }
+            else{
+                $response=array(
+                    'status'=> 0,
+                    'message' => 'Pemesanan gagal .'
+                );
+            }
+        }
+        }	else{
+            $response=array(
+                'status'=> 0,
+                'message'=>'Paramater tidak sesuai.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    public function update_jumlah($id)
+    {
+        global $koneksi;
+        $arrcheckpost = array('jumlah_pengunjung'=>'');
+        parse_str(file_get_contents("php://input"),$input);
+        if(isset($input['jumlah_pengunjung'])){
+            $result = mysqli_query($koneksi,"UPDATE tbl_pemesanan SET jumlah_pengunjung= '{$input['jumlah_pengunjung']}' WHERE id_pemesanan='$id'
+            ");
+
+            if($result)
+            {
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Jumlah berhasil diubah.'
+                );
+            }
+            else{
+                $response=array(
+                    'status'=> 0,
+                    'message' => 'Jumlah gagal diubah.'
+                );
+            }
+        }	else{
+            $response=array(
+                'status'=> 0,
+                'message'=>'Paramater tidak sesuai.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    function delete_pemesanan($id)
+    {
+        global $koneksi;
+        $query="DELETE FROM tbl_pemesanan WHERE id_pemesanan=".$id;
+        $querypemesanan =$koneksi->query("SELECT * FROM tbl_pemesanan WHERE id_pemesanan = '$id' LIMIT 1");
+            $detailpemesanan = $querypemesanan->fetch_assoc();
+            $id_kamar = $detailpemesanan['id_kamar'];
+        if(mysqli_query($koneksi, $query))
+        {
+            $response=array(
+            'status' => 1,
+            'message' =>'Pemesanan Berhasil Dibatalkan.'
+            );
+            $koneksi->query("UPDATE tbl_kamar SET status = 'Kosong' WHERE id_kamar = '$id_kamar'");
+        }
+        else
+        {
+            $response=array(
+            'status' => 0,
+            'message' =>'Gagal Menghapus Pemesanan.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+}
+
+
+
+
+// Class untuk mengolah tabel tbl_tambahan
+class Tagihan{
+    public function get_all_tagihan()
+    {
+        global $koneksi;
+        $query= "SELECT * FROM tbl_tambahan";
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Tagihan Kamar Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        
+    }
+    public function get_tagihan($id=0)
+    {
+        global $koneksi;
+        $query="SELECT * FROM tbl_tambahan";
+        if($id !=0)
+        {
+            $query.=" WHERE id_pemesanan= '$id'";
+        }
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Tagihan Pemesanan Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    public function insert_tagihan()
+    {
+        global $koneksi;
+        $arrcheckpost = array('id_pemesanan'=>'','id_barang'=>'','jumlah_barang'=>'');
+        $hitung = count(array_intersect_key($_POST,$arrcheckpost));
+        if($hitung == count($arrcheckpost)){
+            $id_pemesanan = $_POST['id_pemesanan'];
+            $querypemesanan =$koneksi->query("SELECT * FROM tbl_pemesanan WHERE id_pemesanan = '$id_pemesanan' LIMIT 1");
+            $hitung_pemesanan= mysqli_num_rows($querypemesanan);
+            if($hitung_pemesanan==0){
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Tambah tagihan Gagal, id_pemesanan tidak ada.'
+                );
+            }
+            else{
+            $id_barang = $_POST['id_barang'];
+            $querybarang =$koneksi->query("SELECT * FROM tbl_barang WHERE id_barang = '$id_barang' LIMIT 1");
+            $detailbarang = $querybarang->fetch_assoc();
+            $nama_barang = $detailbarang['nama_barang'];
+            $harga_barang = $detailbarang['harga_barang'];
+            $jumlah_barang = $_POST['jumlah_barang'];
+            $total_harga = $harga_barang*$jumlah_barang;
+
+            $result = mysqli_query($koneksi,"INSERT INTO tbl_tambahan SET
+            id_pemesanan='$id_pemesanan',
+            id_barang='$id_barang',
+            nama_barang='$nama_barang',
+            harga_barang='$harga_barang',
+            jumlah_barang='$jumlah_barang',
+            total_harga='$total_harga'
+            ");
+
+            if($result)
+            {
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Pemesanan berhasil.'
+                );
+            }
+            else{
+                $response=array(
+                    'status'=> 0,
+                    'message' => 'Pemesanan gagal .'
+                );
+            }
+        }
+        }	else{
+            $response=array(
+                'status'=> 0,
+                'message'=>'Paramater tidak sesuai.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    function delete_tagihan($id)
+    {
+        global $koneksi;
+        $query="DELETE FROM tbl_tambahan WHERE id_tambahan=".$id;
+        if(mysqli_query($koneksi, $query))
+        {
+            $response=array(
+            'status' => 1,
+            'message' =>'Tagihan Berhasil Dibatalkan.'
+            );
+        }
+        else
+        {
+            $response=array(
+            'status' => 0,
+            'message' =>'Gagal Menghapus Tagihan.'
             );
         }
         header('Content-Type: application/json');
