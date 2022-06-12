@@ -1021,4 +1021,156 @@ class Tagihan{
         echo json_encode($response);
     }
 }
+
+
+
+
+// Class untuk mengolah tabel tbl_pembayaran
+class Pembayaran{
+    public function get_all_pembayaran()
+    {
+        global $koneksi;
+        $query= "SELECT * FROM tbl_pembayaran";
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Pembayaran Kamar Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        
+    }
+    public function get_pembayaran($id=0)
+    {
+        global $koneksi;
+        $query="SELECT * FROM tbl_pembayaran";
+        if($id !=0)
+        {
+            $query.=" WHERE id_pemesanan= '$id'";
+        }
+        $data=array();
+        $result=$koneksi->query($query);
+        while($row=mysqli_fetch_object($result))
+        {
+            $data[]=$row;
+        }
+        $response=array(
+            'status'=>1,
+            'message'=>'Data Pemesanan Losmen Pojok.',
+            'data'=> $data
+            );
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    public function insert_pembayaran()
+    {
+        global $koneksi;
+        $arrcheckpost = array('id_pemesanan'=>'','id_kasir'=>'','checkout'=>'','pekerja_1'=>'','pekerja_2'=>'');
+        $hitung = count(array_intersect_key($_POST,$arrcheckpost));
+        if($hitung == count($arrcheckpost)){
+            $id_pemesanan = $_POST['id_pemesanan'];
+            $querypemesanan =$koneksi->query("SELECT * FROM tbl_pemesanan JOIN tbl_kamar ON tbl_pemesanan.id_kamar = tbl_kamar.id_kamar WHERE id_pemesanan = '$id_pemesanan' LIMIT 1");
+            $detailpemesanan = $querypemesanan->fetch_assoc();
+            $hitung_pemesanan= mysqli_num_rows($querypemesanan);
+            $status_pembayaran = $detailpemesanan['status_pemesanan'];
+            if($hitung_pemesanan==0){
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Tambah tagihan Gagal, id_pemesanan tidak ada.'
+                );
+            }
+            else{
+            if($status_pembayaran=='Sudah Bayar'){
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Tambah tagihan Gagal, id_pemesanan Sudah Dibayar.'
+                );
+            }
+            else{
+            $jumlah_pengunjung = $detailpemesanan['jumlah_pengunjung'];
+            $id_kamar = $detailpemesanan['id_kamar'];
+            $kapasitas_maks = $detailpemesanan['kapasitas_maks'];
+            $harga_kamar = $detailpemesanan['harga_kamar'];
+            $id_pengunjung = $detailpemesanan['id_pengunjung'];
+            $tgl1 = $detailpemesanan['check_in'];
+            $tgl2 = $_POST['checkout'];
+            $chekin = new DateTime("$tgl1");
+            $checkout = new DateTime("$tgl2");
+            $d = $checkout->diff($chekin)->days + 1;
+            
+
+            if($jumlah_pengunjung > $kapasitas_maks){
+                $tagihan_kamar=($harga_kamar + 50000)*$d;
+            }
+            else{
+                $tagihan_kamar= $harga_kamar*$d;
+            }
+            
+            $querytambahan =$koneksi->query("SELECT SUM(total_harga) AS tagihan_tambahan FROM tbl_tambahan WHERE id_pemesanan = '$id_pemesanan'");
+            $detailtambahan = $querytambahan->fetch_assoc();
+            $hitung_tambahan= mysqli_num_rows($querytambahan);
+
+            if($hitung_tambahan==0){
+                $tagihan_tambahan= 0;
+
+            }
+            else{
+                $tagihan_tambahan = $detailtambahan['tagihan_tambahan'];
+            }
+
+            $total_pembayaran = $tagihan_kamar+$tagihan_tambahan;
+            $result = mysqli_query($koneksi,"INSERT INTO tbl_pembayaran SET
+            id_pemesanan='$id_pemesanan',
+            id_pengunjung='$id_pengunjung',
+            id_kasir='$_POST[id_kasir]',
+            check_out='$tgl2',
+            tagihan_kamar='$tagihan_kamar',
+            tagihan_tambahan='$tagihan_tambahan',
+            pekerja_1='$_POST[pekerja_1]',
+            pekerja_2='$_POST[pekerja_2]',
+            total_pembayaran='$total_pembayaran'
+            ");
+            $id_pembayaran = $koneksi->insert_id;
+            $data_pembayaran = $koneksi->query("SELECT * FROM tbl_pembayaran WHERE id_pembayaran = '$id_pembayaran'");
+            $data=array();
+            while($row=mysqli_fetch_object($data_pembayaran))
+            {
+                $data[]=$row;
+            }
+            if($result)
+            {
+                $response=array(
+                    'status' => 1,
+                    'message' => 'Pemesanan berhasil.',
+                    'data'=> $data
+                );
+                $koneksi->query("UPDATE tbl_kamar SET status = 'Kosong' WHERE id_kamar = '$id_kamar'");
+                $koneksi->query("UPDATE tbl_pemesanan SET status_pemesanan = 'Sudah Bayar' WHERE id_pemesanan = '$id_pemesanan'");
+                echo $d." hari";
+            }
+            else{
+                $response=array(
+                    'status'=> 0,
+                    'message' => 'Pemesanan gagal .'
+                );
+            }
+        }
+    }
+        }	else{
+            $response=array(
+                'status'=> 0,
+                'message'=>'Paramater tidak sesuai.'
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    
+}
 ?>
